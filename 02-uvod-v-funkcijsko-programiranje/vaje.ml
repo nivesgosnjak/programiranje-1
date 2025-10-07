@@ -113,10 +113,11 @@ let primer_html_1 = ovij "h1" "Hello, world!"
 [*----------------------------------------------------------------------------*)
 
 let zamakni st niz = 
-  String.index niz '\n'
-  (* let novi= String.split_on_char '\n' niz in
   let presledek= String.make st ' ' in
-  String.concat presledek novi *)
+  niz
+  |> String.split_on_char '\n'
+  |> List.map (String.cat presledek)
+  |> String.concat "\n"
 
 
 let primer_html_2 = zamakni 4 "Hello,\nworld!"
@@ -127,7 +128,14 @@ let primer_html_2 = zamakni 4 "Hello,\nworld!"
  niz, ki predstavlja ustrezno zamaknjen neurejeni seznam v HTML-ju:
 [*----------------------------------------------------------------------------*)
 
-let ul _ = ()
+let ul sez =
+  sez
+  |> List.map (ovij "li")
+  |> String.concat "\n"
+  |> zamakni 2
+  |> (fun content -> "\n" ^ content ^ "\n")
+  |> ovij "ul"
+
 
 let primer_html_3 = ul ["ananas"; "banana"; "čokolada"]
 (* val primer_html_3 : string =
@@ -142,9 +150,9 @@ let primer_html_3 = ul ["ananas"; "banana"; "čokolada"]
  niz, ki vsebuje vejico, loči na del pred in del za njo.
 [*----------------------------------------------------------------------------*)
 
-let razdeli_vrstico _ = ()
+let razdeli_vrstico niz =
+  String.split_on_char ',' niz 
 
-let primer_seznam_1 = razdeli_vrstico "mleko, 2"
 (* val primer_seznam_1 : string * string = ("mleko", "2") *)
 
 (*----------------------------------------------------------------------------*
