@@ -150,8 +150,11 @@ let primer_html_3 = ul ["ananas"; "banana"; "čokolada"]
  niz, ki vsebuje vejico, loči na del pred in del za njo.
 [*----------------------------------------------------------------------------*)
 
-let razdeli_vrstico niz =
-  String.split_on_char ',' niz 
+let razdeli_vrstico niz = 
+  let i= String.index niz ',' in
+  let hrana= String.sub niz 0 i 
+  and cena = String.sub niz (i+1) (String.length niz - i -1) in
+  (String.trim hrana , String.trim cena)
 
 (* val primer_seznam_1 : string * string = ("mleko", "2") *)
 
@@ -161,8 +164,19 @@ let razdeli_vrstico niz =
  vrednost"`, in vrne seznam ustreznih parov.
 [*----------------------------------------------------------------------------*)
 
-let pretvori_v_seznam_parov _ = ()
+let pretvori_v_seznam_parov niz =
+  niz
+  |> String.trim 
+  |> String.split_on_char '\n'
+  |> List.map razdeli_vrstico
+  (* let a= String.split_on_char '\n' niz in
+  List.map razdeli_vrstico a *)
 
+(* let pretvori_v_seznam_parov niz =
+  niz
+  |> String.trim
+  |> String.split_on_char '\n'
+  |> List.map razdeli_vrstico *)
 let primer_seznam_2 = pretvori_v_seznam_parov "mleko, 2\nkruh, 1\njabolko, 5"
 (* val primer_seznam_2 : (string * string) list =
   [("mleko", "2"); ("kruh", "1"); ("jabolko", "5")] *)
@@ -173,7 +187,8 @@ let primer_seznam_2 = pretvori_v_seznam_parov "mleko, 2\nkruh, 1\njabolko, 5"
  elementov seznama.
 [*----------------------------------------------------------------------------*)
 
-let pretvori_druge_komponente _ _ = ()
+let pretvori_druge_komponente f =
+  List.map (fun (x,y)-> ( x, f y))
 
 let primer_seznam_3 =
   let seznam = [("ata", "mama"); ("teta", "stric")] in
@@ -186,7 +201,20 @@ let primer_seznam_3 =
  znesek nakupa.
 [*----------------------------------------------------------------------------*)
 
-let izracunaj_skupni_znesek _ _ = ()
+let izracunaj_skupni_znesek  cenik sez =
+  let cenik=
+    cenik
+    |> pretvori_v_seznam_parov
+    |> pretvori_druge_komponente float_of_string
+  in
+  let cena_skupaj (izdelek, st)=
+    let cena izdelek = List.assoc izdelek cenik in
+    float_of_string st *. cena izdelek
+  in
+  sez
+  |> pretvori_v_seznam_parov
+  |> List.map cena_skupaj
+  |> vsota_seznama
 
 let primer_seznam_4 = 
   let nakupovalni_seznam = "mleko, 2\njabolka, 5"
