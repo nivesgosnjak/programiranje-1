@@ -18,9 +18,12 @@
 [*----------------------------------------------------------------------------*)
 
 let rec reverse sez = 
+  let rec aux sez acc=
   match sez with
-  |[]->[]
-  | glava :: rep -> reverse rep @ [glava]
+  | []-> acc
+  | x::y -> aux y (x :: acc)
+  in
+  aux sez []
 
 (*----------------------------------------------------------------------------*
  ## Funkcija `repeat`
@@ -146,17 +149,13 @@ let primer_mapi = mapi (+) [0; 0; 0; 2; 2; 2]
  elementov podanih seznamov. Če seznama nista enake dolžine, naj vrne napako.
  Pri tem ne smete uporabiti vgrajene funkcije `List.combine`.
 [*----------------------------------------------------------------------------*)
-
+exception Invalid_input;;
 let rec zip sez1 sez2 =
-  if List.length sez1 =List.length sez2 then
-    match sez1, sez2 with
-    |[],[]-> []
-    | x::y , z::w -> (x ,z) :: zip y w
-    |_,_ -> []
-  else []
+  match sez1, sez2 with
+  |[],[]-> []
+  | x::y , z::w -> (x ,z) :: zip y w
+  |_,_ -> raise Invalid_input
 
-
-  
   (* | _, _ -> print_endline "prentar hoče, da vrže error idk"     *)
 
 let primer_zip_1 = zip [1; 1; 1; 1] [0; 1; 2; 3]
@@ -186,7 +185,13 @@ let primer_unzip_1 = unzip [(0,"a"); (1,"b"); (2,"c")]
  Funkcija `unzip_tlrec` je repno rekurzivna različica funkcije `unzip`.
 [*----------------------------------------------------------------------------*)
 
-let unzip_tlrec _ =()
+let unzip_tlrec sez =
+  let rec aux sez acc=
+  match sez with 
+  | [] -> acc
+  | (x , y) :: z -> aux z ( fst acc @ [x], snd acc @ [y])
+  in
+  aux sez ([],[])
 
 let primer_unzip_2 = unzip_tlrec [(0,"a"); (1,"b"); (2,"c")]
 (* val primer_unzip_2 : int list * string list = ([0; 1; 2], ["a"; "b"; "c"]) *)
@@ -225,7 +230,13 @@ let primer_loop = loop (fun x -> x < 10) ((+) 4) 4
  ... xn)`. V primeru seznama z manj kot dvema elementoma naj vrne napako.
 [*----------------------------------------------------------------------------*)
 
-let rec fold_left_no_acc f sez =()
+let rec fold_left_no_acc f sez = 
+  match sez with
+  | x :: y when List.length y = 1 -> f x (List.nth y 0)
+  | x:: y::z -> fold_left_no_acc f ((f x y) :: z)
+  | _-> raise Invalid_input
+
+
 
 let primer_fold_left_no_acc =
   fold_left_no_acc (^) ["F"; "I"; "C"; "U"; "S"]
