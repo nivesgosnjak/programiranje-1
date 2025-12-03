@@ -121,11 +121,15 @@ module type CALC = sig
 end
 
 module Nat_calculations (N: NAT) : CALC with type t := N.t = struct
-  let factorial _ = (* To morate spremeniti! *)
-    N.zero
-
-  let sum_100 = (* To morate spremeniti! *)
-    N.zero
+  let rec factorial n = 
+    if N.eq n N.zero then N.one else
+      N.( * ) n (factorial (N.(-) n N.one))
+  let sum_100 = 
+    let rec vsota n aux =
+      if N.eq n N.zero then aux else
+        vsota (N.(-) n N.one) (N.(+) n aux)
+    in
+    vsota (N.of_int 100) N.zero
 end
 
 (*----------------------------------------------------------------------------*
@@ -136,18 +140,21 @@ end
   in fakulteto 5.
 [*----------------------------------------------------------------------------*)
 
-<<<<<<< HEAD:05-abstrakcija/vaje.ml
-let sum_nat_100 = 
-  let module Nat = Nat_peano in
-  let rec sum  n =
-  if Nat.eq n Nat.zero then n else
-    Nat.(+) n (sum ( Nat.(-) n Nat.one))
-  in
-  sum (Nat.of_int 100) |> Nat.to_int
-
-=======
 module Nat_int_calc = Nat_calculations (Nat_int)
 module Nat_peano_calc = Nat_calculations (Nat_peano)
+
+let sum_100_int = 
+  Nat_int_calc.sum_100 |> Nat_int.to_int
+let fact_5_int = 
+  Nat_int_calc.factorial (Nat_int.of_int 5) |> Nat_int.to_int
+
+let sum_100_peano = 
+  Nat_peano_calc.sum_100 |> Nat_peano.to_int
+let fact_5_peano =
+  Nat_peano_calc.factorial (Nat_peano.of_int 5) |> Nat_peano.to_int
+
+
+
 
 
 (* val sum_100_int : int = 5050 *)
@@ -170,12 +177,18 @@ module Nat_pair (A: NAT) (B: NAT) : NAT = struct
 
   let eq x y = failwith "later"
   let zero = (A.zero, B.zero)
+  let one = (A.one, B.one)
+  let ( + ) (x , y) (z, w ) = (A.(+) x z, B.(+) y w)
+  let ( * ) (x, y) (z, w) = (A.( * ) x z, B.( * ) y w)
+  let ( - ) (x , y) (z, w) = (A.(-) x z, B.(-) y w)
+  let to_int (x, y)= Int.add (A.to_int x)  (B.to_int y)
+  let of_int x = (A.of_int x, B.of_int x)
   (* Dodajte manjkajoče! *)
 end
 
 module Nat_pair_int_peano = Nat_pair (Nat_int) (Nat_peano)
 (* Poskusite narediti nekaj testnih računov. *)
->>>>>>> 3541cde4963e56862bb3d52ed69361d428d174e9:04-modularnost/vaje.ml
+
 
 (*----------------------------------------------------------------------------*
  ## Kompleksna števila
